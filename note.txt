@@ -1,0 +1,15 @@
+Cara menggunakan program:
+
+1. install library yang dibutuhkan baik yang terpakai secara langsung (import) maupun tidak langsung (dependency)
+dependency yang dibutuhkan adalah tensorflow dan torch
+
+2. jalankan file sentiment.py atau sentiment_indobert.py untuk melakukan training dan testing model
+
+3. jalankan file main.py atau indobert_test.py untuk menggunakan model yang sudah dilatih
+
+NOTE: untuk file sentiment_indobert.py, harus ditraining dengan PC yang memiliki GPU,
+karena model yang digunakan adalah model bert yang membutuhkan resource yang besar,
+untuk dapat menggunakan GPU dalam proses training, jalankan perintah ini pada terminal untuk install pytorch
+secara global
+
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload CSV</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6">Data Latih</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label for="csvFile" class="block text-sm font-medium text-gray-700">Choose CSV File</label>
+                <input type="file" id="csvFile" name="csvFile" accept=".csv" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            <button type="submit" class="bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600">Upload</button>
+            <button id="runSentiment" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 mr-2">Run Sentiment Indobert</button>
+        </form>
+        <div id="status" class="mt-4"></div> <!-- Element to show upload status -->
+        </div>
+        <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md mt-2">
+        <div id="actions" class="mt-4 ">
+            <button id="analys" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Analys</button>
+        </div>
+        <div id="resultCard" class="mt-4 ">
+            <div class="bg-gray-200 p-4 rounded-md">
+                <h2 class="text-lg font-bold mb-2">Analysis Result</h2>
+                <textarea id="analysisResult" class="w-full h-48 bg-white border border-gray-300 rounded-md resize-none p-2" readonly></textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Fungsi untuk menampilkan status unggahan dan mengirim permintaan untuk menjalankan sentiment_indobert.py
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(result => {
+                document.getElementById('status').innerText = result; // Update status element with server response
+                document.getElementById('actions').classList.remove('hidden'); // Show actions buttons
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Fungsi untuk menampilkan output dari sentiment_indobert.py
+        document.getElementById('runSentiment').addEventListener('click', function() {
+            alert('a')
+            document.getElementById('resultCard').classList.remove('hidden'); // Show the result card
+            document.getElementById('analysisResult').value = "Running sentiment analysis...\n"; // Initial message
+            var textarea = document.getElementById('analysisResult');
+            var eventSource = new EventSource('/run_sentiment');
+            eventSource.onmessage = function(event) {
+                textarea.value += event.data + '\n'; // Append new output to the textarea
+                textarea.scrollTop = textarea.scrollHeight; // Scroll to the bottom
+            };
+            eventSource.onerror = function() {
+                eventSource.close();
+                textarea.value += "Error occurred during sentiment analysis.\n"; // Display error message
+            };
+        });
+
+        // Fungsi untuk menjalankan analisis
+        document.getElementById('analys').addEventListener('click', function() {
+            fetch('/analys')
+            .then(response => response.text())
+            .then(result => {
+                document.getElementById('analysisResult').value = result; // Display output on the page
+                document.getElementById('resultCard').classList.remove('hidden'); // Show the result card
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

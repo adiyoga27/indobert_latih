@@ -1,0 +1,9 @@
+pandas
+joblib
+nltk
+deep_translator
+torch
+scikit-learn
+Sastrawi
+transformers
+flask
